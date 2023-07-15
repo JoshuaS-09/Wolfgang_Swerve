@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -23,12 +24,15 @@ public class Robot extends TimedRobot {
   private String autoSelected;
   private final SendableChooser<String> autoChooser = new SendableChooser<>();
   private static final String defaultAuto = "Default";
+  private static final String TestAuto = "TestAuto";
   private static final String ChargeStation = "Charge Station";
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
+  
+  private final Field2d field = new Field2d();
 
   @Override
   public void robotInit() {
@@ -37,15 +41,20 @@ public class Robot extends TimedRobot {
     auto = new Autonomous(drivetrain);
 
     // SmartDashboard
-    SmartDashboard.putData("Gyro", drivetrain.navx);
+    // SmartDashboard.putData("Gyro", drivetrain.navx);
       //Auto
     SmartDashboard.putData("Auto Chooser", autoChooser);
     autoChooser.setDefaultOption("Default Auto", defaultAuto);
+    autoChooser.addOption("TestAuto", TestAuto);
     autoChooser.addOption("Charge Station", ChargeStation);
+    
+    SmartDashboard.putData("FIELD", field);
   }
 
   @Override
   public void robotPeriodic() {
+    field.setRobotPose(drivetrain.m_odometry.getPoseMeters());
+
     if (controller.getStartButtonPressed()) {
       if (driveSlow) {
         driveSlow = false;
@@ -77,6 +86,27 @@ public class Robot extends TimedRobot {
     
     // This code assumes 1000 is 1 meter
     switch (autoSelected) {
+      case TestAuto:
+        if (state == 0) { // Drive half a meter forward
+          if (drivetrain.getDistanceAVG() < 0.5) {
+            auto.driveStraight(0.5);
+          } else {
+            state = 1;
+            auto.driveOff();
+          }
+        } else if (state == 1) {
+          if (drivetrain.getDistanceAVG() < 0) {
+            auto.autoDrive(0, 0, auto.rotate(90));
+          } else {
+            state = 2;
+            auto.driveOff();
+          }
+        }
+        
+        else {
+          auto.driveOff();
+        }
+        break;
       case ChargeStation:
         if (state == 0) {
           if (drivetrain.getDistanceAVG() < 3000) {
