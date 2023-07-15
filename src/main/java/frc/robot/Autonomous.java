@@ -1,15 +1,20 @@
 package frc.robot;
 
+import edu.wpi.first.math.controller.PIDController;
+
 public class Autonomous {
   private Drivetrain drivetrain;
   
   public double autoMaxPower = 0;
   public double driveSMin = 0.10;
   public double autoPower = 0;
+  public PIDController rotController;
   private boolean feildRelative = false;
 
   public Autonomous(Drivetrain drivetrain) {
     this.drivetrain = drivetrain;
+    // TODO: TUNE PID COTROLLER BEFORE USE
+    rotController = new PIDController(0.01, 0, 0);
   }
 
   public void autoDrive(double xSpeed, double ySpeed, double rotSpeed) {
@@ -24,8 +29,19 @@ public class Autonomous {
     drivetrain.drive(0, speed, 0, feildRelative);
   }
 
-  public void rotate(double speed) {
-    drivetrain.drive(0, 0, speed, feildRelative);
+  public double rotate(double angle) {
+    double direction;
+    double setPoint;
+
+    if (drivetrain.robotBearing() < angle) {
+      direction = -1;
+    } else {
+      direction = 1;
+    }
+
+    setPoint = angle * direction;
+    
+    return rotController.calculate(drivetrain.robotBearing(), setPoint);
   }
 
   public void chargeStation() {
