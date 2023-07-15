@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj.SPI;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-  public static double kMaxSpeed = 3.0; // 3 meters per second
+
+  public static double kMaxSpeed = 3.0; // 3 meters per second [AVG MAX 3.5]
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
   private final Translation2d frontLeftLocation = new Translation2d(0.381, 0.381);
@@ -23,18 +24,18 @@ public class Drivetrain {
   private final Translation2d backLeftLocation = new Translation2d(-0.381, 0.381);
   private final Translation2d backRightLocation = new Translation2d(-0.381, -0.381);
 
-  private SwerveModule frontLeft;
-  private SwerveModule frontRight;
-  private SwerveModule backLeft;
-  private SwerveModule backRight;
+  private SwerveModule frontLeft = new SwerveModule(10, 11, 12);
+  private SwerveModule frontRight = new SwerveModule(13, 14, 15);
+  private SwerveModule backLeft = new SwerveModule(16, 17, 18);
+  private SwerveModule backRight = new SwerveModule(19, 20, 21);
 
-  public AHRS navx;
+  public AHRS navx = new AHRS(SPI.Port.kMXP);
 
   private final SwerveDriveKinematics m_kinematics =
       new SwerveDriveKinematics(
           frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
 
-  private final SwerveDriveOdometry m_odometry =
+  public final SwerveDriveOdometry m_odometry =
       new SwerveDriveOdometry(
           m_kinematics,
           navx.getRotation2d(),
@@ -46,11 +47,6 @@ public class Drivetrain {
           });
 
   public Drivetrain() {
-    frontLeft = new SwerveModule(10, 11, 12);
-    frontRight = new SwerveModule(13, 14, 15);
-    backLeft = new SwerveModule(16, 17, 18);
-    backRight = new SwerveModule(19, 20, 21);
-    navx = new AHRS(SPI.Port.kMXP);
     navx.calibrate(); // Calibrates the gyro then resets the yaw, pitch, and roll to zero.
     navx.reset();
   }
