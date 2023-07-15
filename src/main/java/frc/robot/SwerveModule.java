@@ -51,14 +51,11 @@ public class SwerveModule {
   private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
 
   /**
-   * Constructs a SwerveModule with a drive motor, turning motor, drive encoder and turning encoder.
+   * Constructs a SwerveModule with a drive motor, turning motor and turning encoder.
    *
-   * @param driveMotorChannel PWM output for the drive motor.
-   * @param turningMotorChannel PWM output for the turning motor.
-   * @param driveEncoderChannelA DIO input for the drive encoder channel A
-   * @param driveEncoderChannelB DIO input for the drive encoder channel B
-   * @param turningEncoderChannelA DIO input for the turning encoder channel A
-   * @param turningEncoderChannelB DIO input for the turning encoder channel B
+   * @param driveMotorCANChannel CAN ID for the drive motor.
+   * @param turningMotorCANChannel CAN ID for the turning motor.
+   * @param turningCANCoderChannel CAN ID for the turning encoder
    */
   public SwerveModule(
       int driveMotorCANChannel,
